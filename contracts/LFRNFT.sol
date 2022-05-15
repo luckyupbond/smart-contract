@@ -9,12 +9,14 @@ contract LFRNFT is ERC721, ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    constructor() ERC721("LFRNFT", "LFNFT") {}
+    constructor(string memory name, string memory symbol)
+        ERC721(name, symbol)
+    {}
 
-    function mintLFNFT() public returns (uint256) {
+    function mintLFNFT(address player) public returns (uint256) {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
-        _mint(msg.sender, newItemId);
+        _mint(player, newItemId);
         _setTokenURI(newItemId, "glitter.json");
 
         return newItemId;
@@ -38,5 +40,31 @@ contract LFRNFT is ERC721, ERC721URIStorage {
         returns (string memory)
     {
         return super.tokenURI(tokenId);
+    }
+}
+
+contract ContractFactory {
+    address[] public contracts;
+    address public lastContractAddress;
+
+    function getContractCount() public view returns (uint256 contractCount) {
+        return contracts.length;
+    }
+
+    // deploy a new purchase contract
+    function deploy(string memory name, string memory symbol)
+        public
+        returns (address newContract)
+    {
+        LFRNFT c = new LFRNFT(name, symbol);
+        address cAddr = address(c);
+        contracts.push(cAddr);
+        lastContractAddress = cAddr;
+
+        return cAddr;
+    }
+
+    function mint(LFRNFT tokenAddress) public {
+        tokenAddress.mintLFNFT(msg.sender);
     }
 }
