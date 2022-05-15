@@ -13,13 +13,18 @@ contract LFRNFT is ERC721, ERC721URIStorage {
         ERC721(name, symbol)
     {}
 
-    function mintLFNFT(address player) public returns (uint256) {
-        _tokenIds.increment();
-        uint256 newItemId = _tokenIds.current();
-        _mint(player, newItemId);
-        _setTokenURI(newItemId, "glitter.json");
+    function mintLFNFT(address promotor, uint256 totalTicket)
+        public
+        returns (bool)
+    {
+        for (uint256 i = 1; i <= totalTicket; i++) {
+            _tokenIds.increment();
+            uint256 newItemId = _tokenIds.current();
+            _mint(promotor, newItemId);
+            _setTokenURI(newItemId, "glitter.json");
+        }
 
-        return newItemId;
+        return true;
     }
 
     function _baseURI() internal pure override returns (string memory) {
@@ -64,7 +69,7 @@ contract ContractFactory {
         return cAddr;
     }
 
-    function mint(LFRNFT tokenAddress) public {
-        tokenAddress.mintLFNFT(msg.sender);
+    function mint(LFRNFT tokenAddress, uint256 totalSupply) public {
+        tokenAddress.mintLFNFT(msg.sender, totalSupply);
     }
 }
